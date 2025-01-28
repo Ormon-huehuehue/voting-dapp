@@ -4,7 +4,7 @@ import { Connection, PublicKey, Transaction, VersionedTransaction } from "@solan
 import { Voting } from "anchor/target/types/voting";
 import * as anchor from "@coral-xyz/anchor";
 
-const IDL = require("@/anchor/target/idl/voting.json");
+const IDL = require("../../../../anchor/target/idl/voting.json");
 
 
 export async function GET(request: Request) {

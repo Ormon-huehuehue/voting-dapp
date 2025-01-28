@@ -27,6 +27,7 @@
         },
         {
           "name": "poll_account",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -152,6 +153,7 @@
         },
         {
           "name": "candidate_account",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -231,10 +233,6 @@
           {
             "name": "poll_id",
             "type": "u64"
-          },
-          {
-            "name": "poll_name",
-            "type": "string"
           },
           {
             "name": "description",

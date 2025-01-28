@@ -49,31 +49,70 @@ describe('Voting', ()=>{
 
   it("Initialize candidate", async()=>{
 
-     // Define poll_id and candidate_name
+     // Define poll_id
     const pollId = new anchor.BN(2);
-    const candidateName = "nutter";
+
 
     await votingProgram.methods
-    .initializeCandidate(candidateName, pollId) // Pass candidateName (string) and pollId (u64)
+    .initializeCandidate("Smooth", pollId) // Pass candidateName (string) and pollId (u64)
+    .rpc();
+
+
+    await votingProgram.methods
+    .initializeCandidate("Crunchy", pollId) // Pass candidateName (string) and pollId (u64)
     .rpc();
   
-    const [candidateAddress] = PublicKey.findProgramAddressSync(
+    const [crunchyAddress] = PublicKey.findProgramAddressSync(
       [
        pollId.toArrayLike(Buffer, 'le', 8),
-       Buffer.from(candidateName)
+       Buffer.from("Crunchy")
+      ],
+      votingProgramId
+    )
+    const [smoothAddress] = PublicKey.findProgramAddressSync(
+      [
+       pollId.toArrayLike(Buffer, 'le', 8),
+       Buffer.from("Smooth")
       ],
       votingProgramId
     )
 
       // Fetch the candidate account
-    const candidate = await votingProgram.account.candidate.fetch(candidateAddress);
-    console.log("Candidate Account:", candidate);
+    const crunchyCandidate = await votingProgram.account.candidate.fetch(crunchyAddress);
+    console.log("Candidate Account:", crunchyCandidate);
+    expect(crunchyCandidate.candidateVotes.toNumber()).toEqual(0);
+
+  
+
+    const smoothCandidate = await votingProgram.account.candidate.fetch(smoothAddress);
+    console.log("Candidate Account:", smoothCandidate);
+    expect(smoothCandidate.candidateVotes.toNumber()).toEqual(0);
 
   })
 
 
   it("Vote", async()=>{
-    
+    await votingProgram.methods
+    .vote(
+      "Smooth",
+      new anchor.BN(2)
+    )
+    .rpc();
+
+    const [smoothAddress] = PublicKey.findProgramAddressSync(
+      [
+       new anchor.BN(2).toArrayLike(Buffer, 'le', 8),
+       Buffer.from("Smooth")
+      ],
+      votingProgramId
+    )
+
+    const smoothCandidate = await votingProgram.account.candidate.fetch(smoothAddress);
+    console.log("Candidate Account:", smoothCandidate);
+    expect(smoothCandidate.candidateVotes.toNumber()).toEqual(1);
+
+
+
   })
 
 })
