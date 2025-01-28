@@ -31,9 +31,44 @@ use super::*;
     candidate.candidate_name = candidate_name;
     candidate.candidate_votes = 0;
 
+    let poll = &mut ctx.accounts.poll_account;
+    poll.candidate_count += 1;
+
     Ok(())
   }
 
+
+  pub fn vote(
+    ctx : Context<Vote>,
+    _candidate_name : String,
+    _poll_id : u64
+  )-> Result<()>{
+    let candidate = &mut ctx.accounts.candidate_account;
+    candidate.candidate_votes += 1;
+
+    Ok(())
+  }
+
+}
+
+
+#[derive(Accounts)]
+#[instruction(candidate_name : String, poll_id : u64)]
+pub struct Vote<'info>{
+  #[account()]
+  pub signer : Signer<'info>,
+
+  #[account(
+    seeds = [poll_id.to_le_bytes().as_ref()],
+    bump
+  )]
+  pub poll_account : Account<'info, Poll>,
+
+  #[account(
+    seeds = [poll_id.to_le_bytes().as_ref(), candidate_name.as_bytes()],
+    bump
+  )]
+  pub candidate_account : Account<'info, Candidate>,
 }
 
 
