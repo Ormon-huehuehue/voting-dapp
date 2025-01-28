@@ -6,25 +6,33 @@ import { Voting } from "anchor/target/types/voting";
 
 const IDL = require("../target/idl/voting.json");
 
-const votingProgramId = new PublicKey("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF");
+const votingProgramId = new PublicKey("6973L6gnj3rsP5WKshituzg26bjnepoxZK5KWJW6xSbs");
 
 describe('Voting', ()=>{
 
   let context;
-  let provider : BankrunProvider; 
-  let votingProgram : Program<Voting>;
+  let provider; 
+    
+  // let votingProgram : Program<Voting>;  // use this for testing without deploying
+
+  // use this for locally deployed program
+  anchor.setProvider(anchor.AnchorProvider.env())
+  let votingProgram = anchor.workspace.Voting as Program<Voting>;
+
 
   beforeAll(async () => {
-    context = await startAnchor("", [{ name: "voting", programId: votingProgramId }], []);
-    provider = new BankrunProvider(context);
-    votingProgram = new Program<Voting>(IDL, provider);
+    //run this for testing without deploying
+
+    // context = await startAnchor("", [{ name: "voting", programId: votingProgramId }], []);
+    // provider = new BankrunProvider(context);
+    // votingProgram = new Program<Voting>(IDL, provider);
 });
 
 
   it('Initialize Poll', async()=>{
     await votingProgram.methods.initializePoll(
       new anchor.BN(2), // poll id
-      "What is your favourite type of peanut nutter?",  //description
+      "What is your favourite type of peanut butter?",  //description
       new anchor.BN(0), // poll start
       new anchor.BN(1737993400) //poll end
     ).rpc();
@@ -39,9 +47,9 @@ describe('Voting', ()=>{
     const poll = await votingProgram.account.poll.fetch(pollAddress);
 
     
-    // expect(poll.pollId.toNumber()).toEqual(2);
-    // expect(poll.description).toEqual("What is your favourite type of peanut nutter?");
-    // expect(poll.pollStart.toNumber()).toBeLessThan(poll.pollEnd.toNumber());
+    expect(poll.pollId.toNumber()).toEqual(2);
+    expect(poll.description).toEqual("What is your favourite type of peanut butter?");
+    expect(poll.pollStart.toNumber()).toBeLessThan(poll.pollEnd.toNumber());
 
     console.log("POLL :", poll);
 
@@ -110,9 +118,6 @@ describe('Voting', ()=>{
     const smoothCandidate = await votingProgram.account.candidate.fetch(smoothAddress);
     console.log("Candidate Account:", smoothCandidate);
     expect(smoothCandidate.candidateVotes.toNumber()).toEqual(1);
-
-
-
   })
 
 })
